@@ -5,20 +5,41 @@ import MLX
 import MLXLLM
 import MLXLMCommon
 
+enum MLXParserErrors: Error {
+    case unknownModel
+}
+    
 public struct MLXParser: Parser {
     
     var instructions: String
     var logger: Logger?
+    var model: LMModel
     
-    public init(instructions: String, model: String?, logger: Logger?) {
+    public init(instructions: String, model_name: String?, logger: Logger?) throws {
+        
+        var model: LMModel?
+        
+        for m in MLXService.availableModels {
+            
+            if m.name == model_name {
+                model = m
+                break
+            }
+        }
+        
+        if model == nil {
+            throw MLXParserErrors.unknownModel
+        }
+        
         self.instructions = instructions
         self.logger = logger
+        self.model = model!
     }
     
     public func parse(text: String) async -> Result<WallLabel, any Error> {
         
         let mlxService = MLXService()
-        let selectedModel: LMModel = MLXService.availableModels.first!
+        //let selectedModel: LMModel = MLXService.availableModels.first!
         
         let prompt: String = self.instructions + " The text to parse is: " + text
         var result: String = ""
@@ -32,7 +53,7 @@ public struct MLXParser: Parser {
         
         do {
             for await generation in try await mlxService.generate(
-                messages: messages, model: selectedModel)
+                messages: messages, model: self.model, logger: self.logger)
             {
                 switch generation {
                 case .chunk(let chunk):

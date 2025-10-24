@@ -6,6 +6,8 @@
 //
 
 import Foundation
+
+import Logging
 import MLX
 import MLXLLM
 import MLXLMCommon
@@ -46,12 +48,15 @@ class MLXService {
     /// - Parameter model: The model configuration to load
     /// - Returns: A ModelContainer instance containing the loaded model
     /// - Throws: Errors that might occur during model loading
-    private func load(model: LMModel) async throws -> ModelContainer {
+    private func load(model: LMModel, logger: Logger?) async throws -> ModelContainer {
         // Set GPU memory limit to prevent out of memory issues
         MLX.GPU.set(cacheLimit: 20 * 1024 * 1024)
 
+        logger?.debug("Load model \(model.name)")
+        
         // Return cached model if available to avoid reloading
         if let container = modelCache.object(forKey: model.name as NSString) {
+            logger?.debug("Found model cache for \(model.name)")
             return container
         } else {
             // Select appropriate factory based on model type
@@ -64,15 +69,14 @@ class MLXService {
                     LLMModelFactory.shared // This should return an error...
                 }
 
+            logger?.debug("Load model (\(model.name)) from source")
+            
             // Load model and track download progress
             let container = try await factory.loadContainer(
                 hub: .default, configuration: model.configuration
             ) { progress in
-                /*
-                Task { @MainActor in
-                    self.modelDownloadProgress = progress
-                }
-                 */
+                let completed = progress.fractionCompleted * 100
+                logger?.debug("Loading model \(model.name) \(completed)% completed")
             }
 
             // Cache the loaded model for future use
@@ -88,9 +92,9 @@ class MLXService {
     ///   - model: The language model to use for generation
     /// - Returns: An AsyncStream of generated text tokens
     /// - Throws: Errors that might occur during generation
-    func generate(messages: [Message], model: LMModel) async throws -> AsyncStream<Generation> {
+    func generate(messages: [Message], model: LMModel, logger: Logger?) async throws -> AsyncStream<Generation> {
         // Load or retrieve model from cache
-        let modelContainer = try await load(model: model)
+        let modelContainer = try await load(model: model, logger: logger)
 
         // Map app-specific Message type to Chat.Message for model input
         let chat = messages.map { message in
