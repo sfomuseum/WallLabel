@@ -2,7 +2,7 @@ import FoundationModels
 import Foundation
     
 /// WallLabelGenerable is a struct describing structured wall label data and geolocation data for an image of an object.
-@available(iOS 26.0, macOS 26.0)
+@available(iOS 26.0, macOS 26.0, *)
 @Generable(description: "Metadata properties for a wall label depicting a museum object")
 struct WallLabelGenerable: WallLabel,Codable {
         /// The title of the object

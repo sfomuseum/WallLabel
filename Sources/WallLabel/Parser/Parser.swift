@@ -9,12 +9,12 @@ public enum ParserErrors: Error {
 
 public protocol Parser {
     
-    init(parser_uri: String, instructions: String,logger: Logger?) throws
+    init(_ parser_uri: String, instructions: String, logger: Logger?) throws
 
     func parse(text: String) async -> Result<WallLabel, Error>
 }
 
-public func NewParser(parser_uri: String, logger: Logger?) throws -> Parser {
+public func NewParser(_ parser_uri: String, logger: Logger?) throws -> Parser {
     
     guard let u = URL(string: parser_uri) else {
         throw ParserErrors.invalidURI
@@ -26,18 +26,16 @@ public func NewParser(parser_uri: String, logger: Logger?) throws -> Parser {
         switch (u.scheme) {
         case "mlx":
             let instructions = default_instructions + not_generable_instructions
-            label_parser = try MLXParser(parser_uri: parser_uri, instructions: instructions, logger: logger)
+            label_parser = try MLXParser(parser_uri, instructions: instructions, logger: logger)
         case "foundation":
             
-            throw ParserErrors.unsupportedParser
-            
-            /*
-            if #available(iOS 26.0, *) {
-                label_parser = try FoundationModelParser(instructions: default_instructions, model_name: "", logger: logger)
+            if #available(iOS 26.0, macOS 26.0, *) {
+                let instructions = default_instructions
+                label_parser = try FoundationModelParser(parser_uri, instructions: instructions, logger: logger)
             } else {
                 throw ParserErrors.unsupportedParser
             }
-             */
+
         default:
             throw ParserErrors.invalidParser
         }

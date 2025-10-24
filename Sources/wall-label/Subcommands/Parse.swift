@@ -31,7 +31,7 @@ struct Parse: AsyncParsableCommand {
         var label_parser: Parser
         
         do {
-            label_parser = try NewParser(parser_uri: parser_uri, logger: logger)
+            label_parser = try NewParser(parser_uri, logger: logger)
         } catch {
             throw error
         }

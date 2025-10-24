@@ -6,6 +6,13 @@ Swift package for deriving structured data for museum wall label text using on-d
 
 This is a Swift package for deriving structured data for museum wall label text using on-device machine learning (large language) models. It was extracted from the [sfomuseum/Registrar](https://github.com/sfomuseum/Registrar) package in order to make it is easier to develop new parsers and to test existing ones independent of a GUI-based application..
 
+Currently it supports using the built-in "Foundation" models that ship with AppleOS 26 devices and a limited set of models available from HuggingFace which are manipulated using the Apple MLX packages (and which run on pre AppleOS 26 devices). Support for manipulating models using the [llama.cpp XCFramework Swift bindings](https://github.com/ggml-org/llama.cpp?tab=readme-ov-file#xcframework) are in the works but incomplete as of this writing.
+
+
+## Documentation
+
+Documentation is spotty and incomplete at this time.
+
 ## Usage
 
 ```
@@ -37,6 +44,39 @@ case .failure(let error):
 
 ## Parsers
 
+### FoundationModels
+
+To use the built-in "Foundation" models that ship with AppleOS 26 devices create a new `Parser` instance using the following syntax:
+
+```
+foundation://
+```
+
+### MLX
+
+To use models available from HuggingFace and manipulated using the Apple [MLX Swift libraries](https://github.com/ml-explore/mlx-swift/) create a new `Parser` instance using the following syntax:
+
+```
+mlx://?model={MODEL_NAME}
+```
+
+The following models are available when using the `mlx://` parser:
+
+* llama3.2:1b
+* qwen2.5:1.5b
+* smolLM:135m
+* qwen3:0.6b
+* qwen3:1.7b
+* qwen3:4b
+* qwen3:8b
+* acereason:7B
+* gemma3n:E2B
+* gemma3n:E4B 
+
+The choice of these models is a reflection of the fact that the `MLXService` package, which is used to fetch and cache models, was largely copied over wholesale from the [ml-explore/mlx-swift-examples](https://github.com/ml-explore/mlx-swift-examples/blob/main/Applications/MLXChatExample/README.md) package and these models are what came with it.
+
+Other models will be supported in time.
+
 
 ## Tools
 
@@ -59,11 +99,13 @@ OPTIONS:
 
 #### Building
 
-The easiest thing to do is use the handy `cli` Makefile target. Note that it is necessary to build the `wall-label` command line tool with `xcodebuild` rather than `swift build`. This is because of the need to compile the tool with the Apple "Metal" dependencies.
+The easiest thing to build the `wall-label` tool is use the handy `macos` and `macos-tahoe` Makefile targets which take care of excluding inclusion of any Apple `FoundationModel` libraries for pre MacOS 26 devices.
+
+Note that it is necessary to build the `wall-label` command line tool with `xcodebuild` rather than `swift build`. This is because of the need to compile the tool with the Apple "Metal" dependencies.
 
 ```
-$> make cli
-xcodebuild build -scheme wall-label -destination 'platform=OS X'
+$> make macos
+xcodebuild build -scheme wall-label -destination 'platform=OS X' EXCLUDED_SOURCE_FILE_NAMES=Parser_FoundationModel.swift,WallLabel_Generable.swift
 Command line invocation:
     /Applications/Xcode.app/Contents/Developer/usr/bin/xcodebuild build -scheme wall-label -destination "platform=OS X"
 
@@ -99,7 +141,7 @@ $> {YOUR_HOMEDIR}/Library/Developer/Xcode/DerivedData/WallLabel-{SOME_RANDOM_STR
 }
 ```
 
-Note that some models will still return JSON wrapped in Markdown. For example, using the `qwen2.5:1.5b` model:
+Note that aside from the fact that whichever model you are using may just return crazy-talk some models will return crazy-talk wrapped in Markdown. For example, using the `qwen2.5:1.5b` model:
 
 ```
 $> {YOUR_HOMEDIR}/Library/Developer/Xcode/DerivedData/WallLabel-{SOME_RANDOM_STRING}/Build/Products/Debug/wall-label parse \
@@ -128,3 +170,4 @@ $> {YOUR_HOMEDIR}/Library/Developer/Xcode/DerivedData/WallLabel-{SOME_RANDOM_STR
 Error: dataCorrupted(Swift.DecodingError.Context(codingPath: [], debugDescription: "The given data was not valid JSON.", underlyingError: Optional(Error Domain=NSCocoaErrorDomain Code=3840 "Unexpected character '`' around line 1, column 1." UserInfo={NSDebugDescription=Unexpected character '`' around line 1, column 1., NSJSONSerializationErrorIndex=0})))
 ```
 
+Perhaps this issue can be addressed with improved instructions on input. There's lots left to do.

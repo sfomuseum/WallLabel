@@ -16,7 +16,7 @@ public struct MLXParser: Parser {
     var logger: Logger?
     var model: LMModel
     
-    public init(parser_uri: String, instructions: String, logger: Logger?) throws {
+    public init(_ parser_uri: String, instructions: String, logger: Logger?) throws {
         
         guard let u = URL(string: parser_uri) else {
             throw ParserErrors.invalidURI

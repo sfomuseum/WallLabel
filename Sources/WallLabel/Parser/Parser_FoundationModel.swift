@@ -9,7 +9,7 @@ struct FoundationModelParser: Parser {
     var instructions: String
     var logger: Logger?
     
-    init(parser_uri: String, instructions: String, logger: Logger?) throws {
+    init(_ parser_uri: String, instructions: String, logger: Logger?) throws {
         self.instructions = instructions
         self.logger = logger
     }
