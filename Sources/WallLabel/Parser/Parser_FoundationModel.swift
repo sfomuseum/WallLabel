@@ -1,0 +1,53 @@
+import FoundationModels
+import Foundation
+
+struct FoundationModelParser: Parser {
+    
+    var instructions: String
+    
+    init(instructions: String, model: String?) {
+        self.instructions = instructions
+    }
+    
+    func parse(text: String) async -> Result<WallLabel, any Error> {
+        
+        var label = WallLabel(text)
+        label.timestamp = Int(NSDate().timeIntervalSince1970)
+        label.latitude = 0.0
+        label.longitude = 0.0
+        
+            do {
+                
+                // This doesn't work yet because of concurrency issues
+                // let rsp = await label.Parse()
+                
+                // Start of make this a WallLabel method
+                
+                let session = LanguageModelSession(instructions: self.instructions)
+                
+                let response = try await session.respond(
+                    to: text,
+                    generating: WallLabel.self
+                )
+                
+                label.title = response.content.title
+                label.date = response.content.date
+                label.creator = response.content.creator
+                label.location = response.content.location
+                label.accession_number = response.content.accession_number
+                label.medium = response.content.medium
+                label.creditline = response.content.creditline
+                
+                // End of make this a WallLabel method
+                
+                return .success(label)
+
+            } catch {
+                return .failure(error)
+            }
+
+    }
+    
+    
+    
+}
