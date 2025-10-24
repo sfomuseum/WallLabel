@@ -17,6 +17,9 @@ struct Parse: AsyncParsableCommand {
     @Option(help: "The label text to parse in to structured data.")
     var label_text: String = ""
     
+    @Option(help: "Optional custom instructions to use when parsing wall label text.")
+    var instructions: String = ""
+    
     @Option(help: "Enable verbose logging")
     var verbose: Bool = false
     
@@ -31,7 +34,13 @@ struct Parse: AsyncParsableCommand {
         var label_parser: Parser
         
         do {
-            label_parser = try NewParser(parser_uri, logger: logger)
+            
+            if instructions != "" {
+                label_parser = try NewParserWithInstructions(parser_uri, instructions: instructions, logger: logger)
+            } else {
+                label_parser = try NewParser(parser_uri, logger: logger)
+            }
+            
         } catch {
             throw error
         }
