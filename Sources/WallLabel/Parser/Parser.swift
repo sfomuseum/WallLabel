@@ -1,4 +1,4 @@
-protocol Parser {
+public protocol Parser {
     
     init(instructions: String, model: String?)
     
