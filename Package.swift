@@ -16,7 +16,7 @@ let package = Package(
             targets: ["WallLabel"],
         ),
     ], dependencies: [
-        .package(url: "https://github.com/ml-explore/mlx-swift-examples/", branch: "main"),
+        .package(url: "https://github.com/ml-explore/mlx-swift-examples", branch: "main"),
         .package(url: "https://github.com/apple/swift-argument-parser", from: "1.6.2"),
         .package(url: "https://github.com/apple/swift-log", from: "1.6.4")
     ],

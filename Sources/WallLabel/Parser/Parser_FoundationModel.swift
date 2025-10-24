@@ -37,9 +37,7 @@ struct FoundationModelParser: Parser {
                 label.accession_number = response.content.accession_number
                 label.medium = response.content.medium
                 label.creditline = response.content.creditline
-                
-                // End of make this a WallLabel method
-                
+                                
                 return .success(label)
 
             } catch {
