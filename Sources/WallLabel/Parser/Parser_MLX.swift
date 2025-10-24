@@ -4,15 +4,15 @@ import MLX
 import MLXLLM
 import MLXLMCommon
 
-struct MLXParser: Parser {
+public struct MLXParser: Parser {
     
     var instructions: String
     
-    init(instructions: String, model: String?) {
+    public init(instructions: String, model: String?) {
         self.instructions = instructions
     }
     
-    func parse(text: String) async -> Result<WallLabel, any Error> {
+    public func parse(text: String) async -> Result<WallLabel, any Error> {
         
         var label = WallLabel(text)
         label.timestamp = Int(NSDate().timeIntervalSince1970)

@@ -1,6 +1,7 @@
 import FoundationModels
 import Foundation
 
+@available(iOS 26.0, *)
 struct FoundationModelParser: Parser {
     
     var instructions: String
@@ -22,12 +23,12 @@ struct FoundationModelParser: Parser {
                 // let rsp = await label.Parse()
                 
                 // Start of make this a WallLabel method
-                
-                let session = LanguageModelSession(instructions: self.instructions)
+
+                    let session = LanguageModelSession(instructions: self.instructions)
                 
                 let response = try await session.respond(
                     to: text,
-                    generating: WallLabel.self
+                    // generating: WallLabel.self
                 )
                 
                 label.title = response.content.title
