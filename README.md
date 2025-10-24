@@ -99,7 +99,7 @@ OPTIONS:
 
 #### Building
 
-The easiest thing to build the `wall-label` tool is use the handy `macos` and `macos-tahoe` Makefile targets which take care of excluding inclusion of any Apple `FoundationModel` libraries for pre MacOS 26 devices.
+The easiest thing to build the `wall-label` tool is use the handy `macos` and `macos-tahoe` Makefile targets. The former explicitly excludes any Apple `FoundationModel` -related libraries which are not supported on pre-MacOS 26 devices.
 
 Note that it is necessary to build the `wall-label` command line tool with `xcodebuild` rather than `swift build`. This is because of the need to compile the tool with the Apple "Metal" dependencies.
 
