@@ -18,6 +18,7 @@ let package = Package(
     ], dependencies: [
         .package(url: "https://github.com/ml-explore/mlx-swift-examples/", branch: "main"),
         .package(url: "https://github.com/apple/swift-argument-parser", from: "1.6.2"),
+        .package(url: "https://github.com/apple/swift-log", from: "1.6.4")
     ],
     targets: [
         // Targets are the basic building blocks of a package, defining a module or a test suite.
@@ -25,7 +26,8 @@ let package = Package(
         .target(
             name: "WallLabel",
             dependencies: [
-                    .product(name: "MLXLLM", package: "mlx-swift-examples")
+                    .product(name: "MLXLLM", package: "mlx-swift-examples"),
+                    .product(name: "Logging", package: "swift-log")
                 ]
         ),
         .executableTarget(
@@ -33,6 +35,7 @@ let package = Package(
             dependencies: [
                 "WallLabel",
                 .product(name: "ArgumentParser", package: "swift-argument-parser"),
+                .product(name: "Logging", package: "swift-log")
             ]
         ),
         .testTarget(

@@ -1,5 +1,6 @@
 import ArgumentParser
 
+import Logging
 import WallLabel
 
 enum ParseErrors: Error {
@@ -8,24 +9,33 @@ enum ParseErrors: Error {
 }
 
 struct Parse: AsyncParsableCommand {
-    static let configuration = CommandConfiguration(abstract: "...")
+    static let configuration = CommandConfiguration(abstract: "Parse the text of a wall label in to JSON-encoded structured data.")
     
-    @Option(help: "...")
+    @Option(help: "The parser scheme is to use for parsing wall label text.")
     var parser: String = "mlx"
     
-    @Option(help: "The name of the model to parse.")
+    @Option(help: "The name of the model to parse. This does not apply to all parsers.")
     var model: String = ""
     
     @Option(help: "The label text to parse in to structured data.")
     var label_text: String = ""
     
+    @Option(help: "Enable verbose logging")
+    var verbose: Bool = false
+    
     func run() async throws {
+        
+        var logger = Logger(label: "org.sfomuseum.wall-label")
+
+        if verbose {
+            logger.logLevel = .debug
+        }
         
         var label_parser: Parser
         
         switch (parser) {
         case "mlx":
-            label_parser = MLXParser(instructions: default_instructions, model: model)
+            label_parser = MLXParser(instructions: default_instructions, model: model, logger: logger)
         default:
             throw ParseErrors.invalidParser
         }

@@ -1,4 +1,5 @@
 import Foundation
+import Logging
 
 import MLX
 import MLXLLM
@@ -7,17 +8,14 @@ import MLXLMCommon
 public struct MLXParser: Parser {
     
     var instructions: String
+    var logger: Logger?
     
-    public init(instructions: String, model: String?) {
+    public init(instructions: String, model: String?, logger: Logger?) {
         self.instructions = instructions
+        self.logger = logger
     }
     
     public func parse(text: String) async -> Result<WallLabel, any Error> {
-        
-        var label = WallLabel(text)
-        label.timestamp = Int(NSDate().timeIntervalSince1970)
-        label.latitude = 0.0
-        label.longitude = 0.0
         
         let mlxService = MLXService()
         let selectedModel: LMModel = MLXService.availableModels.first!
@@ -40,7 +38,7 @@ public struct MLXParser: Parser {
                 case .chunk(let chunk):
                     result += chunk
                 case .info(let info):
-                    print("INFO \(info)")
+                    self.logger?.debug("INFO \(info)")
                 case .toolCall(_):
                     // print("TOOL \(call)")
                     break
@@ -50,16 +48,19 @@ public struct MLXParser: Parser {
             return .failure(error)
         }
         
-        print("DONE \(result)")
+        self.logger?.debug("DONE \(result)")
         
         let data = result.data(using: .utf8)
         
         do {
-            let l = try JSONDecoder().decode(WallLabel.self, from: data!)
-            label.title = l.title
-            label.date = l.date
-            // and so on...
             
+            var label = try JSONDecoder().decode(WallLabel.self, from: data!)
+            
+            label.input = text
+            label.timestamp = Int(NSDate().timeIntervalSince1970)
+            label.latitude = 0.0
+            label.longitude = 0.0
+
             return .success(label)
         } catch {
             return .failure(error)
