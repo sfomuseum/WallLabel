@@ -1,34 +1,33 @@
 import FoundationModels
 import Foundation
 
-@available(iOS 26.0, *)
+import Logging
+
+@available(iOS 26.0, macOS 26.0, *)
 struct FoundationModelParser: Parser {
     
     var instructions: String
+    var logger: Logger?
     
-    init(instructions: String, model: String?) {
+    init(parser_uri: String, instructions: String, logger: Logger?) throws {
         self.instructions = instructions
+        self.logger = logger
     }
     
     func parse(text: String) async -> Result<WallLabel, any Error> {
         
-        var label = WallLabel(text)
+        var label = WallLabelGenerable(text)
         label.timestamp = Int(NSDate().timeIntervalSince1970)
         label.latitude = 0.0
         label.longitude = 0.0
         
             do {
-                
-                // This doesn't work yet because of concurrency issues
-                // let rsp = await label.Parse()
-                
-                // Start of make this a WallLabel method
 
-                    let session = LanguageModelSession(instructions: self.instructions)
+                let session = LanguageModelSession(instructions: self.instructions)
                 
                 let response = try await session.respond(
                     to: text,
-                    // generating: WallLabel.self
+                    generating: WallLabelGenerable.self
                 )
                 
                 label.title = response.content.title

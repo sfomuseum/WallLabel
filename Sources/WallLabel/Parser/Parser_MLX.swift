@@ -6,6 +6,7 @@ import MLXLLM
 import MLXLMCommon
 
 enum MLXParserErrors: Error {
+    case missingModel
     case unknownModel
 }
     
@@ -15,8 +16,19 @@ public struct MLXParser: Parser {
     var logger: Logger?
     var model: LMModel
     
-    public init(instructions: String, model_name: String?, logger: Logger?) throws {
+    public init(parser_uri: String, instructions: String, logger: Logger?) throws {
         
+        guard let u = URL(string: parser_uri) else {
+            throw ParserErrors.invalidURI
+        }
+        
+        guard let components = URLComponents(url: u, resolvingAgainstBaseURL: false) else {
+            throw ParserErrors.invalidURI
+        }
+        
+        guard let model_name = components.queryItems?.first(where: { $0.name == "model" })?.value else {
+            throw MLXParserErrors.missingModel
+        }
         var model: LMModel?
         
         for m in MLXService.availableModels {
@@ -75,7 +87,7 @@ public struct MLXParser: Parser {
         
         do {
             
-            var label = try JSONDecoder().decode(WallLabel.self, from: data!)
+            var label = try JSONDecoder().decode(WallLabelNotGenerable.self, from: data!)
             
             label.input = text
             label.timestamp = Int(NSDate().timeIntervalSince1970)

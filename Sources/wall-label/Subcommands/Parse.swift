@@ -12,10 +12,7 @@ struct Parse: AsyncParsableCommand {
     static let configuration = CommandConfiguration(abstract: "Parse the text of a wall label in to JSON-encoded structured data.")
     
     @Option(help: "The parser scheme is to use for parsing wall label text.")
-    var parser_scheme: String = "mlx"
-    
-    @Option(help: "The name of the model to parse. This does not apply to all parsers.")
-    var model_name: String = "llama3.2:1b"
+    var parser_uri: String = "mlx://?model=llama3.2:1b"
     
     @Option(help: "The label text to parse in to structured data.")
     var label_text: String = ""
@@ -34,7 +31,7 @@ struct Parse: AsyncParsableCommand {
         var label_parser: Parser
         
         do {
-            label_parser = try NewParser(scheme: parser_scheme, model_name: model_name, logger: logger)
+            label_parser = try NewParser(parser_uri: parser_uri, logger: logger)
         } catch {
             throw error
         }

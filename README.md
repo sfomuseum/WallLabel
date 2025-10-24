@@ -2,21 +2,25 @@
 
 Swift package for deriving structured data for museum wall label text using on-device machine learning (large language) models.
 
+## Motivation
+
+This is a Swift package for deriving structured data for museum wall label text using on-device machine learning (large language) models. It was extracted from the [sfomuseum/Registrar](https://github.com/sfomuseum/Registrar) package in order to make it is easier to develop new parsers and to test existing ones independent of a GUI-based application..
+
 ## Usage
 
 ```
 import Logging
 import WallLabel
 
-let parser_scheme = "mlx"
-let model_name = "llama3.2:1b"
+let parser_uri = "mlx://?model=llama3.2:1b"
+let label_text = "YOUR LABEL TEXT HERE"
 
 let logger = Logger(label: "org.sfomuseum.wall-label")
 
 var label_parser: Parser
         
 do {
-	label_parser = try NewParser(scheme: parser_scheme, model_name: model_name, logger: logger)
+	label_parser = try NewParser(parser_uri: parser_uri, logger: logger)
 } catch {
 	// throw error here...
 }
@@ -31,6 +35,9 @@ case .failure(let error):
 }	
 ```
 
+## Parsers
+
+
 ## Tools
 
 ### wall-label
@@ -39,13 +46,11 @@ case .failure(let error):
 $> wall-label parse -h
 OVERVIEW: Parse the text of a wall label in to JSON-encoded structured data.
 
-USAGE: wall-label parse [--parser_scheme <parser_scheme>] [--model_name <model_name>] [--label_text <label_text>] [--verbose <verbose>]
+USAGE: wall-label parse [--parser_uri <parser_uri>] [--label_text <label_text>] [--verbose <verbose>]
 
 OPTIONS:
-  --parser_scheme <parser_scheme>
-                          The parser scheme is to use for parsing wall label text. (default: mlx)
-  --model_name <model_name>
-                          The name of the model to parse. This does not apply to all parsers. (default: llama3.2:1b)
+  --parser_uri <parser_uri>
+                          The parser scheme is to use for parsing wall label text. (default: mlx://?model=llama3.2:1b)
   --label_text <label_text>
                           The label text to parse in to structured data.
   --verbose <verbose>     Enable verbose logging (default: false)
@@ -74,7 +79,7 @@ This will build the `wall-label` tool in a folder called `{YOUR_HOMEDIR}/Library
 
 ```
 $> {YOUR_HOMEDIR}/Library/Developer/Xcode/DerivedData/WallLabel-{SOME_RANDOM_STRING}/Build/Products/Debug/wall-label parse \
-   	--parser_scheme mlx \
+   	--parser_uri 'mlx://?model=llama3.2:1b' \
 	--label_text 'Promotion, Chiat/ Day: Effective Brick Design Director: Tibor Kalman (American, b. Hungary, 1949–1999); Firm: M&Co (United States); USA offset lithography Gift of Tibor Kalman/ M & Co. Cooper Hewitt Smithsonian National Design Museum 1993-151-257-1' \
 
 | jq
@@ -94,12 +99,13 @@ $> {YOUR_HOMEDIR}/Library/Developer/Xcode/DerivedData/WallLabel-{SOME_RANDOM_STR
 }
 ```
 
-Note that some models will still return JSON wrapped in Markdown. For example:
+Note that some models will still return JSON wrapped in Markdown. For example, using the `qwen2.5:1.5b` model:
 
 ```
 $> {YOUR_HOMEDIR}/Library/Developer/Xcode/DerivedData/WallLabel-{SOME_RANDOM_STRING}/Build/Products/Debug/wall-label parse \
-   	--parser_scheme mlx \
-	--label_text 'Promotion, Chiat/ Day: Effective Brick Design Director: Tibor Kalman (American, b. Hungary, 1949–1999); Firm: M&Co (United States); USA offset lithography Gift of Tibor Kalman/ M & Co. Cooper Hewitt Smithsonian National Design Museum 1993-151-257-1' --model_name qwen2.5:1.5b --verbose=true \
+   	--parser_uri 'mlx://?model=qwen2.5:1.5b` \
+    --verbose=true \       
+	--label_text 'Promotion, Chiat/ Day: Effective Brick Design Director: Tibor Kalman (American, b. Hungary, 1949–1999); Firm: M&Co (United States); USA offset lithography Gift of Tibor Kalman/ M & Co. Cooper Hewitt Smithsonian National Design Museum 1993-151-257-1' \
 
 | jq
 

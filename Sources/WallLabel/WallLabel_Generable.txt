@@ -1,10 +1,10 @@
 import FoundationModels
 import Foundation
     
-    
-    /// WallLabel is a struct describing structured wall label data and geolocation data for an image of an object.
-    @Generable(description: "Metadata properties for a wall label depicting a museum object")
-    struct WallLabel: Codable {
+/// WallLabelGenerable is a struct describing structured wall label data and geolocation data for an image of an object.
+@available(iOS 26.0, macOS 26.0)
+@Generable(description: "Metadata properties for a wall label depicting a museum object")
+struct WallLabelGenerable: WallLabel,Codable {
         /// The title of the object
         //@Guide(description: "The title or name of the object. Sometimes titles may have leading numbers, followed by a space, indicating acting as a key between the wall label and the surface the object is mounted on. Remove these numbers if present.")
         var title: String?
@@ -52,25 +52,7 @@ import Foundation
         init(_ raw: String) {
             input = raw
         }
-        
-        /// Return the ordered list of keys  to display in a UITableView.
-        public func displayKeys() -> [String] {
-            
-            let keys: [String] = [
-                "title",
-                "date",
-                "creator",
-                "location",
-                "medium",
-                "creditline",
-                "accession_number",
-                "latitude",
-                "longitude",
-                "timestamp",
-                "input",
-            ]
-            return keys
-        }
+    
         
         /// Function to update (or not) a given property
         public mutating func setProperty(key: String, value: Any) -> Bool {
@@ -104,17 +86,6 @@ import Foundation
             
             return true
             
-        }
-        
-        /// Boolean method signaling whether a given key's value may be edited.
-        public func isKeyEditable(key: String) -> Bool {
-            
-            switch (key) {
-            case "title", "date", "creator", "medium", "location", "creditline":
-                return true
-            default:
-                return false
-            }
         }
         
         /// Encode the WallLabel instance as JSON.
