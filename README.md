@@ -167,6 +167,7 @@ $> {YOUR_HOMEDIR}/Library/Developer/Xcode/DerivedData/WallLabel-{SOME_RANDOM_STR
   "input": ""
 }
 ```
+```
 Error: dataCorrupted(Swift.DecodingError.Context(codingPath: [], debugDescription: "The given data was not valid JSON.", underlyingError: Optional(Error Domain=NSCocoaErrorDomain Code=3840 "Unexpected character '`' around line 1, column 1." UserInfo={NSDebugDescription=Unexpected character '`' around line 1, column 1., NSJSONSerializationErrorIndex=0})))
 ```
 
