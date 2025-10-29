@@ -2,6 +2,10 @@
 
 Swift package for deriving structured data for museum wall label text using on-device machine learning (large language) models.
 
+## Background
+
+[WallLabel – Experiments with Apple's open source machine-learning frameworks](https://millsfield.sfomuseum.org/blog/2025/10/29/label/)
+
 ## Motivation
 
 This is a Swift package for deriving structured data for museum wall label text using on-device machine learning (large language) models. It was extracted from the [sfomuseum/Registrar](https://github.com/sfomuseum/Registrar) package in order to make it is easier to develop new parsers and to test existing ones independent of a GUI-based application..
